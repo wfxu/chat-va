@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Sider from './sider/index.vue'
-import Content from './content.vue'
+import Content from './content/index.vue'
 
 </script>
 
