@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Sider from './sider/index.vue'
-import Content from './content/index.vue'
 
 </script>
 
@@ -11,7 +10,9 @@ import Content from './content/index.vue'
         class="flex h-full w-full bg-yellow-100"
         >
             <Sider />
-            <Content />
+            <router-view v-slot="{ Component, route }">
+                <component :is="Component" :key="route.fullPath" />
+            </router-view>
         </a-layout>
     </div>
 </template>

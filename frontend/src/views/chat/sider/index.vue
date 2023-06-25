@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, Transition } from 'vue'
+import { ref } from 'vue'
 import { LeftCircleTwoTone, RightCircleTwoTone } from '@ant-design/icons-vue'
 import List from './List.vue'
 import Footer from './Footer.vue'
@@ -28,7 +28,7 @@ function toggleSider() {
         <div class="flex flex-col h-full w-full" style="width: 260px" v-show="!siderCollapsed">
             <main class="flex flex-1 flex-col h-full bg-green-500">
                 <div class="flex flex-1 h-full bg-slate-100 p-4">
-                    list
+                    <List />
                 </div>
             </main>
             <Footer class="w-full bg-white" />

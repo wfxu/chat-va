@@ -1,6 +1,38 @@
 <script setup lang="ts">
 import { AliwangwangFilled, UpCircleFilled } from '@ant-design/icons-vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import axios from 'axios'
+import Message from './Message.vue'
+
+const route = useRoute()
+const { uuid } = route.params as { uuid: string }
+// const dataSources = [
+//   { dateTime: '2022-01-01 10:00:00', text: 'Hello', inversion: false, error: false, loading: false },
+//   { dateTime: '2022-01-01 11:00:00', text: 'Hi!', inversion: true, error: false, loading: false },
+//   { dateTime: '2022-01-01 12:00:00', text: 'How are you?', inversion: false, error: true, loading: false },
+//   { dateTime: '2022-01-01 10:00:00', text: uuid, inversion: true, error: false, loading: false },
+//   // ...
+// ];
+const dataSources = ref(<typeof Message[]>[])
+const fetchData = async (uuid: string | string[]) => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/chat/${uuid}`)
+    dataSources.value = response.data.messages
+    console.log('fetchData', dataSources)
+    // return response.data.messages
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+watch(() => route.params.uuid, (newUuid) => {
+  if (newUuid) {
+    fetchData(newUuid);
+    // (dataSources as any).$forceUpdate();
+    console.log('watch', dataSources)
+  }
+})
 
 const search_string = ref('')
 const onSearch = () => {
@@ -15,10 +47,29 @@ const onSearch = () => {
             <main class="flex-1 overflow-hidden">
                 <div class="h-full overflow-hidden overflow-y-auto">
                     <div class="w-full max-w-screen-xl m-auto dark:bg-[#101014] p-4">
-                        <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
-                            <AliwangwangFilled class="mr-2 text-3xl" />
-                            <span>Aha~</span>
-                        </div>
+                        <template v-if="!uuid">
+                            <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
+                                <AliwangwangFilled class="mr-2 text-3xl" />
+                                <span>Aha~</span>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
+                                <AliwangwangFilled class="mr-2 text-3xl" />
+                                <span>{{ uuid }}</span>
+                            </div>
+                            <div>
+                                <Message 
+                                    v-for="(item, index) of dataSources"
+                                    :key="index"
+                                    :dateTime="item.dateTime"
+                                    :text="item.text"
+                                    :inversion="item.inversion"
+                                    :error="item.error"
+                                    :loading="item.loading"
+                                />
+                            </div>
+                        </template>
                     </div>
                 </div>
             </main>
@@ -29,9 +80,10 @@ const onSearch = () => {
                         placeholder="来说点什么吧...(Shift + Enter = 换行）"
                         :autoSize="{ minRows: 1, maxRows: 5 }"
                         :bordered="false"
-                        class="flex flex-1 h-auto overflow-y-hidden bg-slate-500 px-2 my-2 rounded-md text-white"
+                        size="large"
+                        class="flex w-full overflow-y-hidden bg-slate-500 px-2 my-2 rounded-md text-white"
                     />
-                    <a-button type="primary" class="h-auto" @click="onSearch">
+                    <a-button type="primary" class="h-auto w-auto" @click="onSearch">
                         <UpCircleFilled style="font-size: 25px; color:cadetblue;" class="pl-2 h-full"/>
                     </a-button>
                 </div>
