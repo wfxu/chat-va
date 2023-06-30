@@ -14,7 +14,7 @@ function toggleSider() {
     <a-layout-sider
         :collapsed="siderCollapsed"
         collapsedWidth="0"
-        collapsible="true"
+        :collapsible="true"
         @collapse="toggleSider"
         :width="260"
         class="relative flex h-full min-w-0 bg-red-200 "
