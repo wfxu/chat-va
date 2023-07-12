@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AliwangwangFilled, UpCircleFilled } from '@ant-design/icons-vue'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import Message from './Message.vue'
@@ -19,8 +19,6 @@ const fetchData = async (uuid: string | string[]) => {
   try {
     const response = await axios.get(`http://127.0.0.1:8000/chat/${uuid}`)
     dataSources.value = response.data.messages
-    console.log('fetchData', dataSources)
-    // return response.data.messages
   } catch (error) {
     console.error(error)
   }
@@ -29,10 +27,12 @@ const fetchData = async (uuid: string | string[]) => {
 watch(() => route.params.uuid, (newUuid) => {
   if (newUuid) {
     fetchData(newUuid);
-    // (dataSources as any).$forceUpdate();
-    console.log('watch', dataSources)
   }
 })
+
+onMounted(() => {
+  fetchData(route.params.uuid);
+});
 
 const search_string = ref('')
 const onSearch = () => {
@@ -78,10 +78,11 @@ const onSearch = () => {
                     <a-textarea
                         v-model:value="search_string"
                         placeholder="来说点什么吧...(Shift + Enter = 换行）"
-                        :autoSize="{ minRows: 1, maxRows: 5 }"
+                        :autoSize="{ minRows: 2, maxRows: 5 }"
                         :bordered="false"
                         size="large"
-                        class="flex w-full overflow-y-hidden bg-slate-500 px-2 my-2 rounded-md text-white"
+                        class="custom-textarea flex w-full overflow-y-hidden bg-slate-500 px-2 my-2 rounded-md text-white justify-center
+                        focus:bg-slate-600 focus:text-white focus:border-blue-500 focus:outline-none focus:ring-0"
                     />
                     <a-button type="primary" class="h-auto w-auto" @click="onSearch">
                         <UpCircleFilled style="font-size: 25px; color:cadetblue;" class="pl-2 h-full"/>
@@ -91,3 +92,30 @@ const onSearch = () => {
         </div>
     </a-layout-content>
 </template>
+
+
+<style scoped>
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+/* 外层轨道 */
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+}
+/* 滑块 */
+::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.15);
+  transition: color 0.2s ease;
+}
+
+textarea::placeholder {
+    color: gray;
+    font-size: 1em;
+    font-style: italic;
+}
+</style>

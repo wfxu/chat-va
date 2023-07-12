@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "vue": "vue"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
+    "@vue/cli": "^5.0.8",
     "ant-design-vue": "^3.2.20",
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@types/node": "^20.2.5",
     "@vitejs/plugin-vue": "^4.1.0",
+    "@vue/cli-plugin-typescript": "^4.5.15",
     "naive-ui": "^2.34.4",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",

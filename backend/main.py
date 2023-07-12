@@ -54,7 +54,7 @@ async def chat_id(chat_id: int):
 
     if result:
         messages = json.loads(result[0])
-        response = {"chat_id": chat_id, "messages": messages[:2]}
+        response = {"chat_id": chat_id, "messages": messages}
     else:
         response = {"detail": "Chat not found"}
     conn.close()
