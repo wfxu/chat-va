@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { MehTwoTone, SketchCircleFilled, FrownFilled } from '@ant-design/icons-vue'
+import MarkdownIt from 'markdown-it'
+import mdKatex from '@traptitech/markdown-it-katex'
+import mila from 'markdown-it-link-attributes'
+import hljs from 'highlight.js'
 
 // const inversion = ref(false)
 // const textRef = ref()
@@ -15,10 +19,26 @@ interface Props {
   inversion?: boolean
   error?: boolean
   loading?: boolean
+  asRawText?: boolean
 }
 
 const props = defineProps<Props>()
-const asRawText = ref(props.inversion)
+
+const mdi = new MarkdownIt({
+  html: false,
+  linkify: true,
+  highlight(code: string, language: string) {
+    const validLang = !!(language && hljs.getLanguage(language))
+    if (validLang) {
+      const lang = language ?? ''
+      return highlightBlock(hljs.highlight(code, { language: lang }).value, lang)
+    }
+    return highlightBlock(hljs.highlightAuto(code).value, '')
+  },
+})
+
+mdi.use(mila, { attrs: { target: '_blank', rel: 'noopener' } })
+mdi.use(mdKatex, { blockClass: 'katexmath-block rounded-md p-[10px]', errorColor: ' #cc0000' })
 
 const wrapClass = computed(() => {
   return [
@@ -33,12 +53,23 @@ const wrapClass = computed(() => {
   ]
 })
 
+const text = computed(() => {
+  const value = props.text ?? ''
+  if (!props.asRawText)
+    return mdi.render(value)
+  return value
+})
+
 const handleRegenerate = () => {
   console.log('regenerate')
 }
 
 const handleSelect = () => {
   console.log('select')
+}
+
+function highlightBlock(str: string, lang?: string) {
+  return `<pre class="code-block-wrapper"><div class="code-block-header"><span class="code-block-header__lang">${lang}</span><span class="code-block-header__copy">${t('chat.copyCode')}</span></div><code class="hljs code-block-body ${lang}">${str}</code></pre>`
 }
 
 </script>

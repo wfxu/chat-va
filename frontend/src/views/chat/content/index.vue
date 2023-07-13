@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AliwangwangFilled, UpCircleFilled } from '@ant-design/icons-vue'
+import { AliwangwangFilled, UpCircleFilled, RestFilled } from '@ant-design/icons-vue'
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
@@ -35,8 +35,37 @@ onMounted(() => {
 });
 
 const search_string = ref('')
+
+const visible = ref<boolean>(false);
+const showModal = () => {
+      visible.value = true;
+    };
+const onClear = () => {
+    axios.post(`http://localhost:8000/clear/${uuid}`
+    ).then(response => {
+        console.log(response);
+        fetchData(uuid);
+    }).catch(error => {
+        console.log(error);
+    })
+}
+
 const onSearch = () => {
-    console.log(search_string.value)
+    axios.post('http://localhost:8000/message', {
+        uuid: uuid,
+        dateTime: new Date().toLocaleString(),
+        text: search_string.value,
+        inversion: true, // 根据你的需求修改这些值
+        error: false,
+        loading: false,
+    }).then(response => {
+        console.log(response.data);
+        // 更新你的前端界面
+        search_string.value = '';
+        fetchData(uuid);
+    }).catch(error => {
+        console.log(error);
+    });
 }
 
 </script>
@@ -67,6 +96,7 @@ const onSearch = () => {
                                     :inversion="item.inversion"
                                     :error="item.error"
                                     :loading="item.loading"
+                                    :as-raw-text="item.inversion"
                                 />
                             </div>
                         </template>
@@ -75,10 +105,24 @@ const onSearch = () => {
             </main>
             <footer class="flex flex-row w-full max-h-36 dark:bg-[#101014] justify-center">
                 <div class="flex w-4/5 h-full items-center justify-between space-x-2 p-4">
+                    <a-popconfirm
+                        title="Are you sure delete this task?"
+                        ok-text="Yes"
+                        cancel-text="No"
+                        @confirm="onClear"
+                    >
+                        <a href="#"><RestFilled style="font-size: 25px; color:cadetblue;" class="pr-2 h-full"/></a>
+                    </a-popconfirm>
+                    <a-button type="primary" class="h-auto w-auto" @click="showModal">
+                        <RestFilled style="font-size: 25px; color:cadetblue;" class="pr-2 h-full"/>
+                    </a-button>
+                    <a-modal v-model:visible="visible" title="清空会话" @ok="onClear" >
+                        <a-alert message="Warning" description="确认要清空数据吗?" type="warning" show-icon />
+                    </a-modal>
                     <a-textarea
                         v-model:value="search_string"
                         placeholder="来说点什么吧...(Shift + Enter = 换行）"
-                        :autoSize="{ minRows: 2, maxRows: 5 }"
+                        :autoSize="{ minRows: 1, maxRows: 5 }"
                         :bordered="false"
                         size="large"
                         class="custom-textarea flex w-full overflow-y-hidden bg-slate-500 px-2 my-2 rounded-md text-white justify-center
