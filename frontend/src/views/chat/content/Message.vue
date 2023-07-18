@@ -54,7 +54,7 @@ const wrapClass = computed(() => {
 })
 
 const text = computed(() => {
-  const value = props.text ?? ''
+  const value = props.text ?? '啥也没有哦'
   if (!props.asRawText)
     return mdi.render(value)
   return value
@@ -101,9 +101,9 @@ function highlightBlock(str: string, lang?: string) {
                             <div v-else class="whitespace-pre-wrap" v-text="text" />
                         </div>
                         <div v-else class="whitespace-pre-wrap" v-text="text" />
-                            <template v-if="loading">
-                                <span class="dark:text-white w-[4px] h-[20px] block animate-blink" />
-                            </template>
+                        <template v-if="loading">
+                            <span class="dark:text-white w-[4px] h-[20px] block animate-blink" />
+                        </template>
                     </div>
                 </div>                        
                 <div class="flex flex-col">

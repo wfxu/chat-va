@@ -71,15 +71,6 @@ async def chat_id(chat_id: int):
 @app.post("/message")
 async def receive_message(message_data: MessageData):
 
-    response_text = openai_chat(message_data.text)
-    response_message = {
-        "dateTime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "text": response_text,
-        "inversion": False,
-        "error": False,
-        "loading": False,
-    }
-
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
     cursor.execute("SELECT messages FROM chats WHERE id=?", (message_data.uuid,))
@@ -87,6 +78,21 @@ async def receive_message(message_data: MessageData):
 
     if result:
         messages = json.loads(result[0])
+        messages_list = []
+        for mes in messages:
+            if mes["inversion"]:
+                messages_list.append({"role": "system", "content": mes["text"]})
+            else:
+                messages_list.append({"role": "user", "content": mes["text"]})
+        messages_list.append({"role": "user", "content": message_data.text})
+        response_text = openai_chat(messages_list)
+        response_message = {
+            "dateTime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "text": response_text,
+            "inversion": False,
+            "error": False,
+            "loading": False,
+        }
         messages.append({
             "dateTime": message_data.dateTime,
             "text": message_data.text,
@@ -107,7 +113,7 @@ async def receive_message(message_data: MessageData):
 async def chat_id(chat_id: int):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
-    cursor.execute("UPDATE chats SET messages=? WHERE id=?", ([], chat_id,))
+    cursor.execute("UPDATE chats SET messages=? WHERE id=?", ('[]', chat_id))
     conn.commit()
     conn.close()
     return {"status": "success"}

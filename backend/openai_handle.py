@@ -16,16 +16,13 @@ console_handler.setFormatter(formatter)
 # 将处理器添加到记录器
 logger.addHandler(console_handler)
 
-def openai_chat(message_text):
+def openai_chat(messages_list):
     max_retries = 10
     for i in range(max_retries):
         try:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "你是一个能帮助我的助手."},
-                    {"role": "user", "content": message_text},
-                ],
+                messages=messages_list,
             )
             if response:
                 break
