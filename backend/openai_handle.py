@@ -18,6 +18,7 @@ logger.addHandler(console_handler)
 
 def openai_chat(messages_list):
     max_retries = 10
+    response = ''
     for i in range(max_retries):
         try:
             response = openai.ChatCompletion.create(

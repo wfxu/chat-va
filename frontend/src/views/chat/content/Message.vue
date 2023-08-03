@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { nextTick, computed } from 'vue'
 import { MehTwoTone, SketchCircleFilled, FrownFilled } from '@ant-design/icons-vue'
 import MarkdownIt from 'markdown-it'
 import mdKatex from '@traptitech/markdown-it-katex'
 import mila from 'markdown-it-link-attributes'
 import hljs from 'highlight.js'
+import 'highlight.js/styles/github.css'
 
 // const inversion = ref(false)
 // const textRef = ref()
@@ -25,7 +26,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const mdi = new MarkdownIt({
-  html: false,
+  html: true,
   linkify: true,
   highlight(code: string, language: string) {
     const validLang = !!(language && hljs.getLanguage(language))
@@ -55,10 +56,32 @@ const wrapClass = computed(() => {
 
 const text = computed(() => {
   const value = props.text ?? '啥也没有哦'
+  let renderedText = value;
   if (!props.asRawText)
-    return mdi.render(value)
+    // return mdi.render(value)
+    renderedText = mdi.render(value)
+    // 在 nextTick 中添加事件监听器
+    nextTick(() => {
+      document.querySelectorAll('.code-block-header__copy').forEach((copyButton) => {
+        copyButton.addEventListener('click', copyCodeToClipboard)
+      })
+    })
+    return renderedText
   return value
 })
+
+function copyCodeToClipboard(event: Event) {
+  const code = event.target.closest('.code-block-wrapper').querySelector('.code-block-body').textContent
+  navigator.clipboard.writeText(code)
+  // .then(() => {
+  //   // 复制成功，显示提示信息
+  //   alert('复制成功！')
+  // })
+  // .catch(() => {
+  //   // 复制失败，显示提示信息
+  //   alert('复制失败，请重试。')
+  // })
+}
 
 const handleRegenerate = () => {
   console.log('regenerate')
@@ -69,7 +92,12 @@ const handleSelect = () => {
 }
 
 function highlightBlock(str: string, lang?: string) {
-  return `<pre class="code-block-wrapper"><div class="code-block-header"><span class="code-block-header__lang">${lang}</span><span class="code-block-header__copy">${t('chat.copyCode')}</span></div><code class="hljs code-block-body ${lang}">${str}</code></pre>`
+  return `<pre class="code-block-wrapper">
+  <div class="code-block-header">
+    <span class="code-block-header__lang">${lang}</span>
+    <span class="code-block-header__copy"">copy</span>
+  </div><code class="hljs code-block-body ${lang}">${str}</code>
+</pre>`
 }
 
 </script>
@@ -136,3 +164,7 @@ function highlightBlock(str: string, lang?: string) {
         </div>
     </div>
 </template>
+
+<style lang="less">
+@import url(./style.less);
+</style>

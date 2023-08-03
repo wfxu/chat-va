@@ -1,0 +1,90 @@
+.markdown-body {
+	background-color: transparent;
+	font-size: 14px;
+
+	p {
+		white-space: pre-wrap;
+	}
+
+	ol {
+		counter-reset: list-counter; // 初始化计数器
+		list-style-type: none; // 移除默认的列表样式
+	  }
+	  
+	ol li {
+	position: relative; // 为伪元素设置相对定位
+	padding-left: 20px; // 留出空间放置自定义的列表标记
+	}
+	
+	ol li:before {
+	content: counter(list-counter) "."; // 使用计数器的值
+	counter-increment: list-counter; // 计数器自增
+	position: absolute; // 为伪元素设置绝对定位
+	left: 0; // 将伪元素放在左侧
+	}
+	  
+
+	ul {
+		list-style-type: disc;
+		padding-left: 20px;
+	}
+
+	pre code,
+	pre tt {
+		line-height: 1.65;
+	}
+
+	.highlight pre,
+	pre {
+		background-color: #fff;
+	}
+
+	code.hljs {
+		padding: 0;
+	}
+
+	.code-block {
+		&-wrapper {
+			position: relative;
+			padding-top: 24px;
+		}
+
+		&-header {
+			position: absolute;
+			top: 5px;
+			right: 0;
+			width: 100%;
+			padding: 0 1rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			color: #b3b3b3;
+
+			&__copy {
+				cursor: pointer;
+				margin-left: 0.5rem;
+				user-select: none;
+
+				&:hover {
+					color: #65a665;
+				}
+			}
+		}
+	}
+
+}
+
+html.dark {
+
+	.message-reply {
+		.whitespace-pre-wrap {
+			white-space: pre-wrap;
+			color: var(--n-text-color);
+		}
+	}
+
+	.highlight pre,
+	pre {
+		background-color: #282c34;
+	}
+}
