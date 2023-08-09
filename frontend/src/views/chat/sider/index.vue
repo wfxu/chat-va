@@ -17,10 +17,11 @@ function toggleSider() {
         :collapsible="true"
         @collapse="toggleSider"
         :width="260"
-        class="relative flex h-full min-w-0 bg-red-200 "
+        class="flex h-full min-w-0 bg-slate-500"
+        zeroWidthTriggerStyle="background-color: transparent; width: 18px; height: 18px; left:100%; top: 50%; transform: translate(-50%, -100%);"
     >
-        <template #trigger>
-            <div class="absolute top-1/2 left-full ml-auto transform -translate-x-1/2 -translate-y-1/2 cursor-pointer">
+        <template #trigger >
+            <div style="display: flex; justify-content: center; align-items: center; ">
                 <right-circle-two-tone v-if="siderCollapsed" />
                 <left-circle-two-tone v-else />
             </div>

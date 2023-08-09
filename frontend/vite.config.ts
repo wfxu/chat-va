@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
+  productionSourceMap: false,
   css: {
     postcss: {
       plugins: [
