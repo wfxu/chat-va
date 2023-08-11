@@ -26,11 +26,12 @@ logger.addHandler(console_handler)
 
 def openai_chat(messages_list):
     max_retries = 10
+    max_tokens = 8192
     response = ''
     
     total_token = sum([len(message['content']) for message in messages_list])
     n = 0
-    while total_token > 4090:
+    while total_token > max_tokens:
         if len(messages_list) == 0:
             break
         n += 1
@@ -42,7 +43,7 @@ def openai_chat(messages_list):
             break
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4-0613",
                 messages=messages_list,
             )
             if response:
