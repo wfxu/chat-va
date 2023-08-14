@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3, json, datetime, os
@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from openai_handle import openai_chat
 
 app = FastAPI()
+router = APIRouter()
 
 origins = [
     "http://localhost:5173",
@@ -35,18 +36,18 @@ class MessageData(BaseModel):
 class MessageText(BaseModel):
     text: str
 
-@app.get("/")
+@router.get("/")
 def read_root():
     return {"Hello": "World"}
 
-@app.post("/login")
+@router.post("/login")
 async def login(login_data: LoginData):
     if login_data.username == "admin" and login_data.password == "password":
         return {"status": "success"}
     else:
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
-@app.get("/chat")
+@router.get("/chat")
 async def chat():
     # 一列表形式返回 chats ids
     conn = sqlite3.connect("chat.db")
@@ -56,7 +57,7 @@ async def chat():
     conn.close()
     return [i[0] for i in result]
 
-@app.get("/chat/add")
+@router.get("/chat/add")
 async def add_item():
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -70,7 +71,7 @@ async def add_item():
     conn.commit()
     return {"u_id": new_id}
 
-@app.get("/chat/{chat_id}")
+@router.get("/chat/{chat_id}")
 async def chat_id(chat_id: int):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -95,7 +96,7 @@ async def chat_id(chat_id: int):
     conn.close()
     return response
 
-@app.post("/chat/message")
+@router.post("/chat/message")
 async def receive_message(message_data: MessageData):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -160,7 +161,7 @@ async def receive_message(message_data: MessageData):
     conn.close()
     return {"status": "success"}
 
-@app.post("/chat/clear/{chat_id}")
+@router.post("/chat/clear/{chat_id}")
 async def clear_chart(chat_id: int):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -169,7 +170,7 @@ async def clear_chart(chat_id: int):
     conn.close()
     return {"status": "success"}
 
-@app.post("/chat/delete/{chat_id}")
+@router.post("/chat/delete/{chat_id}")
 async def delete_chart(chat_id: int):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -179,7 +180,7 @@ async def delete_chart(chat_id: int):
     conn.close()
     return {"status": "success"}
 
-@app.post("/chat/{chat_id}/delete/{conv_id}")
+@router.post("/chat/{chat_id}/delete/{conv_id}")
 async def delete_chart_conv(chat_id: int, conv_id: int):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -188,7 +189,7 @@ async def delete_chart_conv(chat_id: int, conv_id: int):
     conn.close()
     return {"status": "success"}
 
-@app.post("/chat/{chat_id}/update/{conv_id}")
+@router.post("/chat/{chat_id}/update/{conv_id}")
 async def update_chat_conv(chat_id: int, conv_id: int, message: MessageText):
     text = message.text
     conn = sqlite3.connect("chat.db")
@@ -198,7 +199,7 @@ async def update_chat_conv(chat_id: int, conv_id: int, message: MessageText):
     conn.close()
     return {"status": "success"}
 
-@app.post("/chat/{chat_id}/generate/{conv_id}")
+@router.post("/chat/{chat_id}/generate/{conv_id}")
 async def generate_chat_conv(chat_id: int, conv_id: int):
     conn = sqlite3.connect("chat.db")
     cursor = conn.cursor()
@@ -221,3 +222,5 @@ async def generate_chat_conv(chat_id: int, conv_id: int):
 
     conn.close()
     return {"status": "success"}
+
+app.include_router(router, prefix="/api")

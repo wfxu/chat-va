@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons-vue'
 
 const items = ref([])
-axios.get('http://127.0.0.1:8000/chat')
+axios.get('/api/chat')
   .then(response => {
     items.value = response.data
   })
@@ -28,10 +28,10 @@ const handleClick = (item: string) => {
 }
 
 const addItem = () => {
-  axios.get('http://127.0.0.1:8000/chat/add')
+  axios.get('/api/chat/add')
     .then(response => {
       console.log(response.data)
-      axios.get('http://127.0.0.1:8000/chat')
+      axios.get('/api/chat')
         .then(response => {
           items.value = response.data
         })
@@ -52,11 +52,11 @@ const showModal = (item: string) => {
   visible.value = true
 }
 const deleteConversation = () => {
-  axios.post(`http://127.0.0.1:8000/chat/delete/${currentItem.value}`)
+  axios.post(`/api/chat/delete/${currentItem.value}`)
   .then(response => {
     if (response.data.status == 'success') {
       visible.value = false
-      axios.get('http://127.0.0.1:8000/chat')
+      axios.get('/api/chat')
           .then(response => {
             items.value = response.data
           })

@@ -9,7 +9,9 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  productionSourceMap: false,
+  build: {
+    sourcemap: false,
+  },
   css: {
     postcss: {
       plugins: [
@@ -23,5 +25,13 @@ export default defineConfig({
       '@': path.resolve(process.cwd(), 'src'),
     },
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.vue'], // 自定义扩展名的优先级顺序
+  },
+  server: {
+    proxy: {
+      '/api/': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+    },
   },
 });

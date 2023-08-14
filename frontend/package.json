@@ -27,9 +27,12 @@
     "vue-router": "^4.0.13"
   },
   "devDependencies": {
+    "@types/markdown-it": "^13.0.0",
+    "@types/markdown-it-link-attributes": "^3.0.1",
     "@types/node": "^20.2.5",
     "@vitejs/plugin-vue": "^4.1.0",
     "@vue/cli-plugin-typescript": "^4.5.15",
+    "less": "^4.2.0",
     "naive-ui": "^2.34.4",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",

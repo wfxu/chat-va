@@ -11,14 +11,14 @@ const { uuid } = route.params as { uuid: string }
 const dataSources = ref(<typeof Message[]>[])
 const fetchData = async (uuid: string | string[]) => {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/chat/${uuid}`)
+    const response = await axios.get(`/api/chat/${uuid}`)
     dataSources.value = response.data.messages
     nextTick(() => {
       const container = document.getElementById('chatContainer');
       if (container) {
         container.scrollTo(0, container.scrollHeight);
       }
-      messageInput.value.focus();
+      messageInput.value?.focus();
     });
   } catch (error) {
     console.error(error)
@@ -42,7 +42,7 @@ const showModal = () => {
       visible.value = true;
     };
 const onClear = () => {
-    axios.post(`http://localhost:8000/chat/clear/${uuid}`
+    axios.post(`/api/chat/clear/${uuid}`
     ).then(response => {
         if (response.data.status == 'success') {
             fetchData(uuid);
@@ -57,8 +57,8 @@ const onClear = () => {
 
 const submitLoading = ref<boolean>(false)
 const submitDisable = ref<boolean>(false)
-const messageInput = ref(null)
-const onSubmit = (e) => {
+const messageInput = ref(null as HTMLInputElement | null);
+const onSubmit = (e: KeyboardEvent) => {
     if (e.shiftKey) {
         return;
     }
@@ -74,8 +74,8 @@ const onSubmit = (e) => {
     }
     search_string.value = '';
     submitDisable.value = true;
-    axios.post('http://localhost:8000/chat/message', messageData)
-    .then(response => {
+    axios.post('/api/chat/message', messageData)
+    .then(() => {
         // 更新你的前端界面
         search_string.value = '';
         fetchData(uuid);

@@ -13,12 +13,12 @@ interface Props {
   uId?: string
   mId?: number
   dateTime?: string
-  text?: Text
+  text: string
   inversion?: number
   error?: number
   loading?: number
   asRawText?: number
-  fetchData?: Function
+  fetchData: Function
 }
 
 const props = defineProps<Props>()
@@ -62,7 +62,7 @@ const wrapClass = computed(() => {
 })
 
 const text = computed(() => {
-  const value = props.text ?? '啥也没有哦'
+  const value = props.text ?? '啥也没有哦';
   let renderedText = value;
   if (!props.asRawText)
     // return mdi.render(value)
@@ -75,24 +75,30 @@ const text = computed(() => {
         copyButton.setAttribute('data-has-listener', 'true');
       })
     })
-  return renderedText.replace(/<p>|<\/p>/g, '')
+    return renderedText.replace(/<p>|<\/p>/g, '');
 })
 
 function copyCodeToClipboard(event: Event) {
-  const code = event.target.closest('.code-block-wrapper').querySelector('.code-block-body').textContent
-  navigator.clipboard.writeText(code)
-  .then(() => {
-    message.success('代码复制成功!')
-  })
-  .catch(() => {
-    console.log('复制失败，请重试。')
-  })
+  const target = event.target as HTMLElement; // 将 event.target 断言为 HTMLElement
+  const code = target.closest('.code-block-wrapper')?.querySelector('.code-block-body')?.textContent;
+  if (code){
+    navigator.clipboard.writeText(code)
+    .then(() => {
+      message.success('代码复制成功!')
+    })
+    .catch(() => {
+      console.log('复制失败，请重试。')
+    })
+  } else {
+    console.log('没有找到要复制的代码。')
+  }
+
 }
 
 const generateLoading = ref<boolean>(false)
 const handleGenerate = () => {
   generateLoading.value = true
-  axios.post(`http://127.0.0.1:8000/chat/${props.uId}/generate/${props.mId}`)
+  axios.post(`/api/chat/${props.uId}/generate/${props.mId}`)
   .then(response => {
     generateLoading.value = false
     if (response.data.status == 'success') {
@@ -100,7 +106,7 @@ const handleGenerate = () => {
       message.success('生成成功!')
     }
   })
-  .catch(err =>{
+  .catch(() =>{
     generateLoading.value = false
   })
 }
@@ -111,7 +117,7 @@ const handleEdit = () => {
   isEditing.value = true
 }
 const doneEdit = () => {
-  axios.post(`http://127.0.0.1:8000/chat/${props.uId}/update/${props.mId}`, { text: editText.value })
+  axios.post(`/api/chat/${props.uId}/update/${props.mId}`, { text: editText.value })
   .then(response => {
     if (response.data.status == 'success') {
       isEditing.value = false
@@ -140,7 +146,7 @@ const deleteShowModal = () => {
 }
 
 const handleDelete = () => {
-  axios.post(`http://127.0.0.1:8000/chat/${props.uId}/delete/${props.mId}`)
+  axios.post(`/api/chat/${props.uId}/delete/${props.mId}`)
   .then(response => {
     if (response.data.status == 'success') {
       deleteVisible.value = false
@@ -211,7 +217,7 @@ const handleDelete = () => {
                             <span class="dark:text-white w-[4px] h-[20px] block animate-blink" />
                         </template>
                     </div>
-                    <div v-else contenteditable="true" @input="editText = $event.target.innerText" class="whitespace-pre-wrap" style="box-sizing: border-box" v-text="text">
+                    <div v-else contenteditable="true" @input="editText = ($event.target as HTMLElement).innerText" class="whitespace-pre-wrap" style="box-sizing: border-box" v-text="text">
                     </div>
                 </div>       
             </div>
